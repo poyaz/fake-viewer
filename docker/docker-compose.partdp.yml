@@ -1,0 +1,18 @@
+version: '2.2'
+services:
+#  api:
+#    build:
+#      context: docker/dockerfile/part/api
+#    environment:
+#      - "NODE_ENV=part"
+#    expose:
+#      - 80
+#    volumes:
+#      - /etc/localtime:/etc/localtime:ro
+#    command:  sh -c "npm install --only=prod; npm start"
+
+  tor:
+    image: docker.loc:5000/dperson/torproxy
+    networks:
+      - main
+    restart: "always"

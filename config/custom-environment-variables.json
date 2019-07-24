@@ -1,0 +1,40 @@
+{
+  "server": {
+    "host": "SERVER_HOST",
+    "http": {
+      "port": "HTTP_PORT"
+    },
+    "https": {
+      "port": "HTTPS_PORT"
+    },
+    "public": {
+      "host": "SERVER_PUBLIC_HOST",
+      "http": {
+        "port": "HTTP_PUBLIC_PORT"
+      },
+      "https": {
+        "port": "HTTPS_PUBLIC_PORT"
+      }
+    }
+  },
+  "custom": {
+    "proxy": "PROXY_ADDRESS",
+    "download": {
+      "protocol": "DOWNLOAD_PROTOCOL",
+      "host": "DOWNLOAD_HOST",
+      "port": "DOWNLOAD_PORT",
+      "replace": {
+        "from": "DOWNLOAD_REPLACE_FROM",
+        "to": "DOWNLOAD_REPLACE_TO"
+      }
+    },
+    "rocket": {
+      "url": "ROCKET_CHAT_URL",
+      "api": "ROCKET_CHAT_API_VERSION",
+      "bot": {
+        "username": "ROCKET_CHAT_USERNAME",
+        "password": "ROCKET_CHAT_PASSWORD"
+      }
+    }
+  }
+}

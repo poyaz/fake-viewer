@@ -1,0 +1,41 @@
+version: '2.2'
+services:
+#  bot:
+#    image: node:10.16.0-alpine
+#    working_dir: /app
+#    expose:
+#      - 3000
+#    volumes:
+#      - $PWD:/app
+#    networks:
+#      - main
+#    environment:
+#      - "NPM_REGISTRY=https://registry.npmjs.org"
+#    command:  sh -c "npm install; npm start"
+#    restart: "always"
+
+  tor:
+    image: dperson/torproxy
+#    networks:
+#      - main
+    network_mode: host
+    environment:
+      - "TOR_SocksPort=9080"
+#    volumes:
+#      - $PWD/storage/private/torrc:/etc/tor/torrc:ro
+    restart: "always"
+
+#networks:
+#  main:
+
+#curl -x socks5://127.0.0.1:9080 ifconfig.io
+#SocksPort 9080
+#SocksPort 9081
+#SocksPort 9082
+#SocksPort 9083
+#SocksPort 9084
+#SocksPort 9085
+#SocksPort 9086
+#SocksPort 9087
+#SocksPort 9088
+#SocksPort 9089

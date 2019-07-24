@@ -1,0 +1,15 @@
+.tests
+build
+lib/database/index.js
+lib/handler/execute.backup1.js
+lib/handler/execute.backup2.js
+lib/proxy/database.js
+node_modules
+scripts/watch.js
+services/income
+services/job
+services/person
+storage/certificate
+storage/temp
+*.yml
+*.sh

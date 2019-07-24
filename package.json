@@ -1,0 +1,60 @@
+{
+  "name": "aparat-fake-viewer",
+  "version": "0.1.0",
+  "main": "./index.js",
+  "scripts": {
+    "postinstall": "npm run build",
+    "build": "node ./scripts/build.js",
+    "nodemon": "./node_modules/nodemon/bin/nodemon.js --inspect=0.0.0.0 --ignore tests/ index.js",
+    "start": "node index.js",
+    "test": "./node_modules/.bin/mocha tests/*/*.js --reporter mochawesome --reporter-options reportDir=tests/report,reportFilename=output --exit"
+  },
+  "dependencies": {
+    "bluebird": "^3.5.5",
+    "config": "^2.0.2",
+    "puppeteer": "^1.19.0",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "@babel/cli": "7.0.0",
+    "@babel/core": "7.0.0",
+    "@babel/polyfill": "7.0.0",
+    "@babel/register": "7.0.0",
+    "babel-eslint": "9.0.0",
+    "chai": "^4.1.2",
+    "eslint": "^5.5.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-flowtype": "^2.50.0",
+    "eslint-plugin-html": "^4.0.5",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-json": "^1.2.1",
+    "eslint-plugin-markdown": "^1.0.0-beta.8",
+    "eslint-plugin-node": "^7.0.1",
+    "eslint-plugin-prettier": "^2.6.2",
+    "eslint-plugin-promise": "^4.0.0",
+    "eslint-plugin-security": "^1.4.0",
+    "eslint-plugin-standard": "^4.0.0",
+    "faker": "^4.1.0",
+    "flow-bin": "^0.80.0",
+    "mocha": "^5.2.0",
+    "mocha-logger": "^1.0.6",
+    "mochawesome": "^3.0.3",
+    "nodemon": "^1.18.3",
+    "nyc": "^13.0.1",
+    "prettier": "^1.18.2",
+    "sane": "^3.0.0"
+  },
+  "engines": {
+    "node": "~=10.16.0"
+  },
+  "os": [
+    "linux"
+  ],
+  "author": "pooya_azarpour@yahoo.com",
+  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/poyaz/aparat-fake-viewer.git"
+  },
+  "license": "MIT"
+}

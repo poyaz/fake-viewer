@@ -1,0 +1,13 @@
+{
+  "verbose": true,
+  "ignore": [
+    ".tests/*",
+    "tests/*",
+    "storage/*",
+    "node_modules/*",
+    "docs/*",
+    "docker/*",
+    "build/*",
+    "scripts/*"
+  ]
+}
