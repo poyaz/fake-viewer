@@ -19,17 +19,23 @@ async function run() {
   const browser = await puppeteer.launch({
     headless: true,
     args: [
-      '--proxy-server=socks5://127.0.0.1:9080'
+      '--proxy-server=socks5://127.0.0.1:9080',
+      '--disable-dev-shm-usage',
     ]
   });
 
-  const ipPage = await browser.newPage();
-  await ipPage.goto('https://api.ipify.org');
+  // const ipPage = await browser.newPage();
+  // await ipPage.goto('https://api.ipify.org');
 
   const videoPage = await browser.newPage();
   const id = uuid();
-  list[id] = { finished: false, fail: false, visit: 0, close: browser.close };
-  goToVideo(id, browser, 'https://www.aparat.com/v/OHRe7', videoPage).catch((error) => console.error(error));
+  list[id] = { finished: false, fail: false, visit: 0, page: videoPage, browser };
+  goToVideo(id, browser, 'https://www.aparat.com/v/OHRe7', videoPage).catch((error) => {
+    if (error.message.toString().match(/Target closed/)) {
+      return;
+    }
+    console.error(error);
+  });
 }
 
 async function goToVideo(id, browser, url, page) {
@@ -46,6 +52,7 @@ async function goToVideo(id, browser, url, page) {
       waitUntil: 'networkidle2',
       timeout: 0
     });
+
     if (response._status === 200) {
       await play(page);
       await page.waitForFunction(
@@ -84,15 +91,15 @@ async function getNextVideo(page) {
 }
 
 setInterval(() => {
-  console.log(list);
   if (searchInterval > 5) {
     resetAll();
     return;
   }
 
   searchInterval++;
-  const totalFinish = Object.keys(list).filter((v) => list[v].finished || list[v].visit > tabBreak);
-  if (totalFinish < 5) {
+  const keys = Object.keys(list);
+  const totalFinish = keys.filter((v) => list[v].finished);
+  if (totalFinish < (keys.length / 2)) {
     return;
   }
 
@@ -101,7 +108,14 @@ setInterval(() => {
 
 function resetAll() {
   searchInterval = 0;
-  Object.keys(list).forEach((v) => list[v].close());
+  Object.keys(list).forEach(async (v) => {
+    const { page, browser } = list[v];
+    page.close().catch((error) => console.log('close page', error));
+    await Promise.delay(1000);
+    browser.close().catch((error) => console.log('close Browser', error));
+    await Promise.delay(3000);
+    delete list[v];
+  });
   console.log('should reset tor');
 }
 
