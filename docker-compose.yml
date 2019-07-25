@@ -15,18 +15,18 @@ services:
 #    restart: "always"
 
   tor:
-    image: dperson/torproxy
-#    networks:
-#      - main
-    network_mode: host
+    build:
+      context: docker/images/default/tor
+    networks:
+      - main
     environment:
-      - "TOR_SocksPort=9080"
+      - "SOCKSPORT=0.0.0.0:9080,0.0.0.0:9081,0.0.0.0:9082,0.0.0.0:9083,0.0.0.0:9084,0.0.0.0:9085,0.0.0.0:9086,0.0.0.0:9087,0.0.0.0:9088,0.0.0.0:9089"
 #    volumes:
 #      - $PWD/storage/private/torrc:/etc/tor/torrc:ro
     restart: "always"
 
-#networks:
-#  main:
+networks:
+  main:
 
 #curl -x socks5://127.0.0.1:9080 ifconfig.io
 #SocksPort 9080

@@ -1,9 +1,8 @@
 {
-  "name": "aparat-fake-viewer",
+  "name": "fake-viewer",
   "version": "0.1.0",
   "main": "./index.js",
   "scripts": {
-    "postinstall": "npm run build",
     "build": "node ./scripts/build.js",
     "nodemon": "./node_modules/nodemon/bin/nodemon.js --inspect=0.0.0.0 --ignore tests/ index.js",
     "start": "node index.js",
@@ -13,7 +12,8 @@
     "bluebird": "^3.5.5",
     "config": "^2.0.2",
     "puppeteer": "^1.19.0",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "@babel/cli": "7.0.0",

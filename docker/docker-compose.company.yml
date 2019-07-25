@@ -12,7 +12,6 @@ services:
 #    command:  sh -c "npm install --only=prod; npm start"
 
   tor:
-    image: docker.loc:5000/dperson/torproxy
-    networks:
-      - main
+    build:
+      context: docker/images/company/tor
     restart: "always"

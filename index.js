@@ -2,7 +2,8 @@
  * Created by pooya on 6/16/19.
  */
 
-process.env.PUPPETEER_EXECUTABLE_PATH = '/usr/lib/chromium/chromium';
+// process.env.PUPPETEER_EXECUTABLE_PATH = '/usr/lib/chromium/chromium';
+process.env.PUPPETEER_EXECUTABLE_PATH = '/lib/chromium/chromium';
 
 const config = require('config');
 const Promise = require('bluebird');
@@ -10,18 +11,22 @@ const puppeteer = require('puppeteer');
 const uuid = require('uuid/v4');
 const urlParser = require('url');
 
+const logger = require('./lib/log/winston');
+
 const tabBreak = 1;
 let searchInterval = 0;
+
+const failRate = 50;
+const finishRate = 50;
+const videoUrl = 'https://www.aparat.com/v/OHRe7';
+const headless = false;
 
 const list = {};
 
 async function run() {
   const browser = await puppeteer.launch({
-    headless: true,
-    args: [
-      '--proxy-server=socks5://127.0.0.1:9080',
-      '--disable-dev-shm-usage',
-    ]
+    headless,
+    args: ['--proxy-server=socks5://172.27.0.2:9080', '--disable-dev-shm-usage'],
   });
 
   // const ipPage = await browser.newPage();
@@ -29,12 +34,12 @@ async function run() {
 
   const videoPage = await browser.newPage();
   const id = uuid();
-  list[id] = { finished: false, fail: false, visit: 0, page: videoPage, browser };
-  goToVideo(id, browser, 'https://www.aparat.com/v/OHRe7', videoPage).catch((error) => {
+  list[id] = { finished: false, failed: false, visit: 0, page: videoPage, browser };
+  goToVideo(id, browser, videoUrl, videoPage).catch((error) => {
     if (error.message.toString().match(/Target closed/)) {
       return;
     }
-    console.error(error);
+    logger.error(error);
   });
 }
 
@@ -46,15 +51,15 @@ async function goToVideo(id, browser, url, page) {
   list[id].visit++;
 
   try {
-    console.log(`Send request for get page "${url}"`);
+    logger.info(`Send request for get page "${url}" (browser id: "${id}")`);
     const { protocol: urlProtocol, host: urlHost } = urlParser.parse(url);
     const response = await page.goto(url, {
       waitUntil: 'networkidle2',
-      timeout: 0
+      timeout: 0,
     });
 
     if (response._status === 200) {
-      await play(page);
+      await play(id, page);
       await page.waitForFunction(
         'Array.from(document.querySelectorAll(".vjs-progress-holder")).filter((d) => Number(d.getAttribute("aria-valuenow")) === 100).length > 0',
         { timeout: 0 },
@@ -62,25 +67,27 @@ async function goToVideo(id, browser, url, page) {
       const nextUrl = await getNextVideo(page);
       await goToVideo(id, browser, `${urlProtocol}//${urlHost}${nextUrl}`, page);
     } else {
-      list[id].fail = true;
+      list[id].failed = true;
     }
   } catch (error) {
-    list[id].fail = true;
+    list[id].failed = true;
     throw error;
   }
 }
 
-async function play(page) {
-  console.log('Start watching');
+async function play(id, page) {
+  logger.info(`Start watching video (browser id: "${id}")`);
   await page.waitForSelector('.vjs-big-play-button');
   await page.$eval('.vjs-big-play-button', (el) => el.click());
 }
 
 async function getNextVideo(page) {
-  const result = await page.evaluate(() => {
+  const result = await page.evaluate(($) => {
     const data = [];
     $('.thumbnail-video').each(function() {
-      const url = $(this).find('a.title').attr('href');
+      const url = $(this)
+        .find('a.title')
+        .attr('href');
       data.push(url);
     });
     return data;
@@ -98,8 +105,15 @@ setInterval(() => {
 
   searchInterval++;
   const keys = Object.keys(list);
+
+  const totalFail = keys.filter((v) => list[v].failed);
+  if (Math.floor((totalFail * 100) / keys.length) >= failRate) {
+    resetAll();
+    return;
+  }
+
   const totalFinish = keys.filter((v) => list[v].finished);
-  if (totalFinish < (keys.length / 2)) {
+  if (Math.floor((totalFinish * 100) / keys.length) < finishRate) {
     return;
   }
 
