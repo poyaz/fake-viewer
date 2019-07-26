@@ -26,7 +26,7 @@ const list = {};
 async function run() {
   const browser = await puppeteer.launch({
     headless,
-    args: ['--proxy-server=socks5://172.27.0.2:9080', '--disable-dev-shm-usage'],
+    args: ['--proxy-server=socks5://172.26.0.2:9081', '--disable-dev-shm-usage'],
   });
 
   // const ipPage = await browser.newPage();
@@ -60,8 +60,11 @@ async function goToVideo(id, browser, url, page) {
 
     if (response._status === 200) {
       await play(id, page);
+      if (list[id].visit === 1) {
+        likeVideo(id, page);
+      }
       await page.waitForFunction(
-        'Array.from(document.querySelectorAll(".vjs-progress-holder")).filter((d) => Number(d.getAttribute("aria-valuenow")) === 100).length > 0',
+        'Array.from(document.querySelectorAll(".vjs-progress-holder")).filter((el) => Number(el.getAttribute("aria-valuenow")) === 100).length > 0',
         { timeout: 0 },
       );
       const nextUrl = await getNextVideo(page);
@@ -81,8 +84,22 @@ async function play(id, page) {
   await page.$eval('.vjs-big-play-button', (el) => el.click());
 }
 
+function likeVideo(id, page) {
+  const random = Math.floor(Math.random() * 60) + 30;
+
+  page.waitForFunction(
+    `Array.from(document.querySelectorAll(".vjs-progress-holder")).filter((el) => Number(el.getAttribute("aria-valuenow")) >= ${random}).length > 0`,
+    { timeout: 0 },
+  )
+    .then(async () => {
+      logger.info(`Like video (browser id: "${id}")`);
+      await page.$eval('#likeVideoButton:not(.is-liked)', (el) => el.click());
+    })
+    .catch((error) => logger.error(error));
+}
+
 async function getNextVideo(page) {
-  const result = await page.evaluate(($) => {
+  const result = await page.evaluate(() => {
     const data = [];
     $('.thumbnail-video').each(function() {
       const url = $(this)
